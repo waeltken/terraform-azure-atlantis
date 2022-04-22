@@ -44,6 +44,16 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.main.kube_config.0.cluster_ca_certificate)
 }
 
+provider "kubectl" {
+  host                   = azurerm_kubernetes_cluster.main.kube_config.0.host
+  username               = azurerm_kubernetes_cluster.main.kube_config.0.username
+  password               = azurerm_kubernetes_cluster.main.kube_config.0.password
+  client_certificate     = base64decode(azurerm_kubernetes_cluster.main.kube_config.0.client_certificate)
+  client_key             = base64decode(azurerm_kubernetes_cluster.main.kube_config.0.client_key)
+  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.main.kube_config.0.cluster_ca_certificate)
+  load_config_file       = "false"
+}
+
 provider "helm" {
   kubernetes {
     host                   = azurerm_kubernetes_cluster.main.kube_config.0.host
@@ -70,6 +80,20 @@ resource "helm_release" "traefik" {
   # }
 }
 
+module "cert_manager" {
+  source  = "terraform-iaac/cert-manager/kubernetes"
+  version = "v2.4.2"
+
+  cluster_issuer_email = var.letsencrypt_email
+  solvers = [{
+    http01 = {
+      ingress = {
+        class = local.traefik_name
+      }
+    }
+  }]
+}
+
 data "kubernetes_service" "traefik" {
   metadata {
     name      = local.traefik_name
@@ -91,46 +115,6 @@ resource "azurerm_dns_a_record" "cluster_ingress_dns_record" {
 
   ttl     = 300
   records = [data.kubernetes_service.traefik.status.0.load_balancer.0.ingress.0.ip]
-}
-
-resource "helm_release" "cert_manager" {
-  name       = local.cert_manager_name
-  repository = "https://charts.jetstack.io"
-  chart      = "cert-manager"
-  version    = "v1.8.0"
-
-  namespace        = local.cert_manager_name
-  create_namespace = true
-
-  set {
-    name  = "installCRDs"
-    value = true
-  }
-
-  set {
-    name  = "ingressShim.defaultIssuerKind"
-    value = "ClusterIssuer"
-  }
-
-  set {
-    name  = "ingressShim.defaultIssuerName"
-    value = "letsencrypt-prod"
-  }
-}
-
-resource "kubernetes_manifest" "clusterissuer_letsencrypt_prod" {
-  manifest = yamldecode(templatefile(
-    "${path.module}/letsencrypt-issuer.tpl.yaml",
-    {
-      "name"          = "letsencrypt-prod"
-      "email"         = var.letsencrypt_email
-      "server"        = "https://acme-v02.api.letsencrypt.org/directory"
-      "ingress_class" = "traefik"
-    }
-  ))
-  depends_on = [
-    helm_release.cert_manager
-  ]
 }
 
 resource "helm_release" "atlantis" {
@@ -162,6 +146,12 @@ resource "helm_release" "atlantis" {
   set {
     name  = "ingress.annotations.kubernetes\\.io/ingress\\.class"
     value = "traefik"
+    type  = "string"
+  }
+
+  set {
+    name  = "ingress.annotations.cert-manager\\.io/cluster-issuer"
+    value = module.cert_manager.cluster_issuer_name
     type  = "string"
   }
 
