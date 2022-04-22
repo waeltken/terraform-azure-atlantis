@@ -146,19 +146,17 @@ resource "helm_release" "atlantis" {
   set {
     name  = "ingress.annotations.kubernetes\\.io/ingress\\.class"
     value = "traefik"
+  }
+
+  set {
+    name  = "ingress.annotations.traefik\\.ingress\\.kubernetes\\.io/router\\.tls"
+    value = "true"
     type  = "string"
   }
 
   set {
     name  = "ingress.annotations.cert-manager\\.io/cluster-issuer"
     value = module.cert_manager.cluster_issuer_name
-    type  = "string"
-  }
-
-  set {
-    name  = "ingress.annotations.kubernetes\\.io/tls-acme"
-    value = "true"
-    type  = "string"
   }
 
   set {
