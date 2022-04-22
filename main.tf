@@ -74,10 +74,10 @@ resource "helm_release" "traefik" {
   namespace        = local.traefik_name
   create_namespace = true
 
-  # set {
-  #   name  = "ports.web.redirectTo"
-  #   value = "websecure"
-  # }
+  set {
+    name  = "ports.web.redirectTo"
+    value = "websecure"
+  }
 }
 
 module "cert_manager" {
@@ -92,6 +92,10 @@ module "cert_manager" {
       }
     }
   }]
+
+  depends_on = [
+    azurerm_kubernetes_cluster.main
+  ]
 }
 
 data "kubernetes_service" "traefik" {
@@ -140,7 +144,7 @@ resource "helm_release" "atlantis" {
 
   set {
     name  = "atlantisUrl"
-    value = "https://atlantis.ms.waltken.de"
+    value = "https://${length(azurerm_dns_a_record.cluster_ingress_dns_record) > 0 ? trimsuffix(azurerm_dns_a_record.cluster_ingress_dns_record.0.fqdn, ".") : ""}"
   }
 
   set {
@@ -169,20 +173,20 @@ resource "helm_release" "atlantis" {
     value = length(azurerm_dns_a_record.cluster_ingress_dns_record) > 0 ? trimsuffix(azurerm_dns_a_record.cluster_ingress_dns_record.0.fqdn, ".") : ""
   }
 
-  set {
-    name  = "githubApp.id"
-    value = var.atlantis_github_app_id
-  }
+  # set {
+  #   name  = "githubApp.id"
+  #   value = var.atlantis_github_app_id
+  # }
 
-  set {
-    name  = "githubApp.key"
-    value = var.atlantis_github_app_key
-  }
+  # set {
+  #   name  = "githubApp.key"
+  #   value = var.atlantis_github_app_key
+  # }
 
-  set {
-    name  = "githubApp.secret"
-    value = var.atlantis_github_app_webhook_secret
-  }
+  # set {
+  #   name  = "githubApp.secret"
+  #   value = var.atlantis_github_app_webhook_secret
+  # }
 
   set {
     name  = "github.user"
