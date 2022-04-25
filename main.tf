@@ -127,6 +127,11 @@ resource "helm_release" "atlantis" {
   namespace        = var.name
   create_namespace = true
 
+  # set {
+  #   name  = "image.tag"
+  #   value = "v0.17.6"
+  # }
+
   set {
     name  = "orgWhitelist"
     value = join(", ", var.atlantis_repo_allowlist)
@@ -168,35 +173,35 @@ resource "helm_release" "atlantis" {
     value = length(azurerm_dns_a_record.cluster_ingress_dns_record) > 0 ? trimsuffix(azurerm_dns_a_record.cluster_ingress_dns_record.0.fqdn, ".") : ""
   }
 
-  # set {
-  #   name  = "githubApp.id"
-  #   value = var.atlantis_github_app_id
-  # }
-
-  # set {
-  #   name  = "githubApp.key"
-  #   value = var.atlantis_github_app_key
-  # }
-
-  # set {
-  #   name  = "githubApp.secret"
-  #   value = var.atlantis_github_app_webhook_secret
-  # }
-
   set {
-    name  = "github.user"
-    value = "fake"
+    name  = "githubApp.id"
+    value = var.atlantis_github_app_id
   }
 
   set {
-    name  = "github.token"
-    value = "fake"
+    name  = "githubApp.key"
+    value = var.atlantis_github_app_key
   }
 
   set {
-    name  = "github.secret"
-    value = "fake"
+    name  = "githubApp.secret"
+    value = var.atlantis_github_app_webhook_secret
   }
+
+  # set {
+  #   name  = "github.user"
+  #   value = "fake"
+  # }
+
+  # set {
+  #   name  = "github.token"
+  #   value = "fake"
+  # }
+
+  # set {
+  #   name  = "github.secret"
+  #   value = "fake"
+  # }
 
   depends_on = [
     module.cert_manager

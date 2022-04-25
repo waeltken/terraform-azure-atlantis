@@ -1,4 +1,10 @@
 terraform {
+  backend "azurerm" {
+    resource_group_name  = "default"
+    storage_account_name = "tfstateaia"
+    container_name       = "tfstate"
+    key                  = "tf-azure-atlantis.tfstate"
+  }
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
