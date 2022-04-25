@@ -73,11 +73,6 @@ resource "helm_release" "traefik" {
 
   namespace        = local.traefik_name
   create_namespace = true
-
-  set {
-    name  = "ports.web.redirectTo"
-    value = "websecure"
-  }
 }
 
 module "cert_manager" {
@@ -190,16 +185,20 @@ resource "helm_release" "atlantis" {
 
   set {
     name  = "github.user"
-    value = "foo"
+    value = "fake"
   }
 
   set {
     name  = "github.token"
-    value = "bar"
+    value = "fake"
   }
 
   set {
     name  = "github.secret"
-    value = "baz"
+    value = "fake"
   }
+
+  depends_on = [
+    module.cert_manager
+  ]
 }
