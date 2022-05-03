@@ -1,27 +1,17 @@
 variable "name" {
-  description = "Name to use on all resources created (AKS cluster, etc)"
+  description = "Name to use on all resources created (ServicePlan, WebApp, etc)"
   type        = string
   default     = "atlantis"
+}
+
+variable "webapp_name" {
+  description = "Unique name for Azure WebApp"
+  type        = string
 }
 
 variable "location" {
   description = "Azure Region to deploy your resources to"
   type        = string
-}
-
-variable "aks_version_prefix" {
-  type    = string
-  default = "1.22"
-}
-
-variable "aks_node_count" {
-  type    = number
-  default = 1
-}
-
-variable "aks_node_type" {
-  type    = string
-  default = "Standard_B2s"
 }
 
 variable "tags" {
@@ -108,13 +98,4 @@ variable "atlantis_github_app_webhook_secret" {
   description = "GitHub webhook secret of an app that is running the Atlantis command"
   type        = string
   default     = ""
-}
-
-variable "dns_zone_name" {
-  type    = string
-  default = ""
-}
-
-variable "letsencrypt_email" {
-  type = string
 }
