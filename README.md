@@ -1,1 +1,1 @@
-# Azure Terraform module which runs Atlantis on AKS
+# Terraform module which runs Atlantis on Azure AppService
