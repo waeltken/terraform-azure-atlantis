@@ -2,6 +2,13 @@
 locals {
 }
 
+resource "random_string" "unique" {
+  length  = 6
+  special = false
+  number  = false
+  upper   = false
+}
+
 resource "azurerm_resource_group" "main" {
   name     = var.name
   location = var.location
@@ -13,6 +20,21 @@ resource "azurerm_service_plan" "atlantis" {
 
   os_type  = "Linux"
   sku_name = "S1"
+}
+
+resource "azurerm_storage_account" "atlantis" {
+  name                = "${var.name}data${random_string.unique.result}"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_storage_share" "atlantis" {
+  name                 = "${var.name}-data"
+  storage_account_name = azurerm_storage_account.atlantis.name
+  quota                = var.storage_quota
 }
 
 resource "azurerm_linux_web_app" "atlantis" {
@@ -29,6 +51,15 @@ resource "azurerm_linux_web_app" "atlantis" {
       docker_image     = var.docker_image
       docker_image_tag = var.docker_image_tag
     }
+  }
+
+  storage_account {
+    name         = "atlantis-data"
+    account_name = azurerm_storage_account.atlantis.name
+    access_key   = azurerm_storage_account.atlantis.primary_access_key
+    type         = "AzureFiles"
+    mount_path   = "/atlantis-data"
+    share_name   = azurerm_storage_share.atlantis.name
   }
 
   app_settings = {

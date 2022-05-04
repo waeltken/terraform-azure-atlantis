@@ -109,3 +109,8 @@ variable "docker_image_tag" {
   type    = string
   default = "v0.18.0"
 }
+
+variable "storage_quota" {
+  type    = number
+  default = 50
+}
