@@ -99,3 +99,13 @@ variable "atlantis_github_app_webhook_secret" {
   type        = string
   default     = ""
 }
+
+variable "docker_image" {
+  type    = string
+  default = "ghcr.io/runatlantis/atlantis"
+}
+
+variable "docker_image_tag" {
+  type    = string
+  default = "v0.18.0"
+}

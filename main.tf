@@ -1,6 +1,3 @@
-provider "azurerm" {
-  features {}
-}
 
 locals {
 }
@@ -29,8 +26,8 @@ resource "azurerm_linux_web_app" "atlantis" {
     always_on = true
 
     application_stack {
-      docker_image     = "ghcr.io/runatlantis/atlantis"
-      docker_image_tag = "v0.19.2"
+      docker_image     = var.docker_image
+      docker_image_tag = var.docker_image_tag
     }
   }
 
