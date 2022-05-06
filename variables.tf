@@ -120,3 +120,8 @@ variable "atlantis_write_git_creds" {
   type    = bool
   default = true
 }
+
+variable "arm_use_msi" {
+  type    = bool
+  default = true
+}
