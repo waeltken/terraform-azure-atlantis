@@ -1,9 +1,13 @@
 
 locals {
+  # Workaround for broken /github-app/setup path in latest versions.
+  docker_image_tag = var.run_for_install ? "v0.18.0" : var.docker_image_tag
+
   dummy_user = {
     "ATLANTIS_GH_USER"  = "foo"
     "ATLANTIS_GH_TOKEN" = "bar"
   }
+
   app_settings = {
     "ATLANTIS_GH_APP_ID"         = var.atlantis_github_app_id
     "ATLANTIS_GH_APP_KEY"        = var.atlantis_github_app_key
