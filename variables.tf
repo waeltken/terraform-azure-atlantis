@@ -79,6 +79,7 @@ variable "atlantis_github_webhook_secret" {
   description = "GitHub webhook secret of an app that is running the Atlantis command"
   type        = string
   default     = ""
+  sensitive   = true
 }
 
 # Github App
@@ -92,12 +93,7 @@ variable "atlantis_github_app_key" {
   description = "GitHub Application private key of the app that is running the Atlantis command"
   type        = string
   default     = ""
-}
-
-variable "atlantis_github_app_webhook_secret" {
-  description = "GitHub webhook secret of an app that is running the Atlantis command"
-  type        = string
-  default     = ""
+  sensitive   = true
 }
 
 variable "docker_image" {
@@ -107,5 +103,20 @@ variable "docker_image" {
 
 variable "docker_image_tag" {
   type    = string
-  default = "v0.18.0"
+  default = "v0.19.2"
+}
+
+variable "storage_quota" {
+  type    = number
+  default = 50
+}
+
+variable "run_for_install" {
+  type    = bool
+  default = false
+}
+
+variable "atlantis_write_git_creds" {
+  type    = bool
+  default = true
 }
