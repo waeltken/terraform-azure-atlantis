@@ -94,12 +94,6 @@ variable "atlantis_github_app_key" {
   default     = ""
 }
 
-variable "atlantis_github_app_webhook_secret" {
-  description = "GitHub webhook secret of an app that is running the Atlantis command"
-  type        = string
-  default     = ""
-}
-
 variable "docker_image" {
   type    = string
   default = "ghcr.io/runatlantis/atlantis"
@@ -113,4 +107,14 @@ variable "docker_image_tag" {
 variable "storage_quota" {
   type    = number
   default = 50
+}
+
+variable "run_for_install" {
+  type    = bool
+  default = false
+}
+
+variable "atlantis_write_git_creds" {
+  type    = bool
+  default = true
 }

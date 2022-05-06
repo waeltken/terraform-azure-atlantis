@@ -1,5 +1,19 @@
 
 locals {
+  dummy_user = {
+    "ATLANTIS_GH_USER"  = "foo"
+    "ATLANTIS_GH_TOKEN" = "bar"
+  }
+  app_settings = {
+    "ATLANTIS_GH_APP_ID"         = var.atlantis_github_app_id
+    "ATLANTIS_GH_APP_KEY"        = var.atlantis_github_app_key
+    "ATLANTIS_GH_WEBHOOK_SECRET" = var.atlantis_github_webhook_secret
+    "ATLANTIS_REPO_WHITELIST"    = join(", ", var.atlantis_repo_allowlist)
+    "ATLANTIS_PORT"              = var.atlantis_port
+    "WEBSITES_PORT"              = var.atlantis_port
+    "ATLANTIS_ATLANTIS_URL"      = "https://${var.webapp_name}.azurewebsites.net"
+    "ATLANTIS_WRITE_GIT_CREDS"   = var.atlantis_write_git_creds
+  }
 }
 
 resource "random_string" "unique" {
@@ -13,6 +27,7 @@ resource "azurerm_resource_group" "main" {
   name     = var.name
   location = var.location
 }
+
 resource "azurerm_service_plan" "atlantis" {
   name                = "atlantis-serviceplan"
   location            = azurerm_resource_group.main.location
@@ -62,16 +77,5 @@ resource "azurerm_linux_web_app" "atlantis" {
     share_name   = azurerm_storage_share.atlantis.name
   }
 
-  app_settings = {
-    "ATLANTIS_GH_APP_ID"             = var.atlantis_github_app_id
-    "ATLANTIS_GH_APP_KEY"            = var.atlantis_github_app_key
-    "ATLANTIS_GH_APP_WEBHOOK_SECRET" = var.atlantis_github_app_webhook_secret
-    "ATLANTIS_GH_USER"               = "foo"
-    "ATLANTIS_GH_TOKEN"              = "bar"
-    "ATLANTIS_GH_WEBHOOK_SECRET"     = var.atlantis_github_app_webhook_secret
-    "ATLANTIS_REPO_WHITELIST"        = join(", ", var.atlantis_repo_allowlist)
-    "ATLANTIS_PORT"                  = var.atlantis_port
-    "WEBSITES_PORT"                  = var.atlantis_port
-    "ATLANTIS_ATLANTIS_URL"          = "https://${var.webapp_name}.azurewebsites.net"
-  }
+  app_settings = var.run_for_install ? merge(local.app_settings, local.dummy_user) : local.app_settings
 }
