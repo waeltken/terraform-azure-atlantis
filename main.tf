@@ -17,6 +17,7 @@ locals {
     "WEBSITES_PORT"              = var.atlantis_port
     "ATLANTIS_ATLANTIS_URL"      = "https://${var.webapp_name}.azurewebsites.net"
     "ATLANTIS_WRITE_GIT_CREDS"   = var.atlantis_write_git_creds
+    "ARM_USE_MSI"                = var.arm_use_msi
   }
 }
 
@@ -62,6 +63,10 @@ resource "azurerm_linux_web_app" "atlantis" {
   resource_group_name = azurerm_resource_group.main.name
   service_plan_id     = azurerm_service_plan.atlantis.id
   https_only          = true
+
+  identity {
+    type = "SystemAssigned"
+  }
 
   site_config {
     always_on = true
