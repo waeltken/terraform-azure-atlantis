@@ -1,14 +1,16 @@
 # Terraform module which runs Atlantis on Azure AppService
 
+Azure Terraform module for [Atlantis](https://www.runatlantis.io/) Terraform Pull Request Automation.
+
 ```terraform
-module "atlantis" {
+# Example usage as a terraform module
 module "atlantis" {
   source = "./terraform-azure-atlantis"
 
   location = "WestEurope"
 
-  atlantis_repo_allowlist = ["github.com/waeltken/*"]
-  webapp_name             = "cwatlantis"
+  atlantis_repo_allowlist = ["github.com/someorg/*"]
+  webapp_name             = "myatlantis"
 
   # Use this to start with dummy credentials to do the intial install
   # of the GitHub App
